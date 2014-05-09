@@ -401,7 +401,7 @@ bool cVNSIChannelScan::OnAction(int actionId)
   if (actionId == ADDON_ACTION_CLOSE_DIALOG || actionId == ADDON_ACTION_PREVIOUS_MENU)
     OnClick(BUTTON_BACK);
 
-  return true;
+  return false;
 }
 
 bool cVNSIChannelScan::OnInitCB(GUIHANDLE cbhdl)
