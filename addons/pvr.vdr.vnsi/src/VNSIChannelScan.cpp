@@ -95,6 +95,9 @@ bool cVNSIChannelScan::Open(const std::string& hostname, int port, const char* n
   if(!cVNSIData::Open(hostname, port, "XBMC channel scanner"))
     return false;
 
+  if (!Login())
+    return false;
+
   /* Load the Window as Dialog */
   m_window = GUI->Window_create("ChannelScan.xml", "Confluence", false, true);
   m_window->m_cbhdl   = this;
