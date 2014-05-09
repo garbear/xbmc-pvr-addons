@@ -23,6 +23,9 @@
 #include "VNSISession.h"
 #include "client.h"
 
+#include "platform/threads/threads.h"
+#include "platform/threads/mutex.h"
+
 #include <string>
 #include <map>
 
@@ -87,4 +90,5 @@ private:
   SMessages        m_queue;
   std::string      m_videodir;
   PLATFORM::CMutex m_mutex;
+  PLATFORM::CEvent m_stoppedEvent;
 };

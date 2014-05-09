@@ -34,6 +34,7 @@ cVNSIData::cVNSIData()
 
 cVNSIData::~cVNSIData()
 {
+  m_stoppedEvent.Broadcast();
   StopThread();
   Close();
 }
@@ -798,14 +799,14 @@ void *cVNSIData::Process()
     // try to reconnect
     if(ConnectionLost() && !TryReconnect())
     {
-      Sleep(1000);
+      m_stoppedEvent.Wait(1000);
       continue;
     }
 
     // if there's anything in the buffer, read it
     if ((vresp = cVNSISession::ReadMessage(5)) == NULL)
     {
-      Sleep(5);
+      m_stoppedEvent.Wait(5);
       continue;
     }
 
