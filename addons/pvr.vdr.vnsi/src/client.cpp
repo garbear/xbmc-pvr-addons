@@ -408,11 +408,18 @@ PVR_ERROR GetDriveSpace(long long *iTotal, long long *iUsed)
   return (VNSIData->GetDriveSpace(iTotal, iUsed) ? PVR_ERROR_NO_ERROR : PVR_ERROR_SERVER_ERROR);
 }
 
+cVNSIChannelScan g_scanner;
+
 PVR_ERROR DialogChannelScan(void)
 {
-  cVNSIChannelScan scanner;
-  scanner.Open(g_szHostname, g_iPort);
-  return PVR_ERROR_NO_ERROR;
+  if (!g_scanner.IsRunning())
+  {
+    g_scanner.SetHostname(g_szHostname);
+    g_scanner.SetPort(g_iPort);
+    g_scanner.CreateThread();
+    return PVR_ERROR_NO_ERROR;
+  }
+  return PVR_ERROR_FAILED;
 }
 
 /*******************************************/

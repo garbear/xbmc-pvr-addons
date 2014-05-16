@@ -24,6 +24,7 @@
 #include "client.h"
 #include <string>
 #include <map>
+#include "platform/threads/threads.h"
 
 typedef enum scantype
 {
@@ -36,60 +37,20 @@ typedef enum scantype
 } scantype_t;
 
 
-class cVNSIChannelScan : public cVNSIData
+class cVNSIChannelScan : public PLATFORM::CThread
 {
 public:
-
   cVNSIChannelScan();
   ~cVNSIChannelScan();
 
-  bool Open(const std::string& hostname, int port, const char* name = "XBMC channel scanner");
-
-  bool OnClick(int controlId);
-  bool OnFocus(int controlId);
-  bool OnInit();
-  bool OnAction(int actionId);
-
-  static bool OnClickCB(GUIHANDLE cbhdl, int controlId);
-  static bool OnFocusCB(GUIHANDLE cbhdl, int controlId);
-  static bool OnInitCB(GUIHANDLE cbhdl);
-  static bool OnActionCB(GUIHANDLE cbhdl, int actionId);
+  void SetHostname(const std::string& hostname) { m_strHostname = hostname; }
+  void SetPort(int port) { m_iPort = port; }
 
 protected:
-
-  bool OnResponsePacket(cResponsePacket* resp);
+  virtual void* Process();
 
 private:
-
-  bool ReadCountries();
-  bool ReadSatellites();
-  void SetControlsVisible(scantype_t type);
-  void StartScan();
-  void StopScan();
-  void ReturnFromProcessView();
-  void SetProgress(int procent);
-  void SetSignal(int procent, bool locked);
-
-  std::string     m_header;
-  std::string     m_Signal;
-  bool            m_running;
-  bool            m_stopped;
-  bool            m_Canceled;
-
-  CAddonGUIWindow      *m_window;
-  CAddonGUISpinControl *m_spinSourceType;
-  CAddonGUISpinControl *m_spinCountries;
-  CAddonGUISpinControl *m_spinSatellites;
-  CAddonGUISpinControl *m_spinDVBCInversion;
-  CAddonGUISpinControl *m_spinDVBCSymbolrates;
-  CAddonGUISpinControl *m_spinDVBCqam;
-  CAddonGUISpinControl *m_spinDVBTInversion;
-  CAddonGUISpinControl *m_spinATSCType;
-  CAddonGUIRadioButton *m_radioButtonTV;
-  CAddonGUIRadioButton *m_radioButtonRadio;
-  CAddonGUIRadioButton *m_radioButtonFTA;
-  CAddonGUIRadioButton *m_radioButtonScrambled;
-  CAddonGUIRadioButton *m_radioButtonHD;
-  CAddonGUIProgressControl *m_progressDone;
-  CAddonGUIProgressControl *m_progressSignal;
+  cVNSIData   m_vnsiData;
+  std::string m_strHostname;
+  int         m_iPort;
 };

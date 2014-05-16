@@ -23,7 +23,7 @@
 #define VNSI_COMMAND_H
 
 /** Current VNSI Protocol Version number */
-#define VNSI_PROTOCOLVERSION 5
+#define VNSI_PROTOCOLVERSION 6
 
 /** Packet types */
 #define VNSI_CHANNEL_REQUEST_RESPONSE 1
@@ -100,6 +100,7 @@
 #define VNSI_SCAN_GETSATELLITES    142
 #define VNSI_SCAN_START            143
 #define VNSI_SCAN_STOP             144
+#define VNSI_SCAN_PROGRESS         145
 
 /* OPCODE 160 - 179: VNSI network functions for channel scanning */
 #define VNSI_OSD_CONNECT           160
