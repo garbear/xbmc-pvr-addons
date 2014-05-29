@@ -50,6 +50,7 @@ class CAddonGUIRadioButton;
 class CAddonGUIProgressControl;
 class CAddonListItem;
 class CAddonGUIRenderingControl;
+class CAddonGUIProgressBar;
 
 class CHelper_libXBMC_gui
 {
@@ -169,6 +170,21 @@ public:
       dlsym(m_libXBMC_gui, "GUI_control_release_rendering");
     if (GUI_control_release_rendering == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
 
+    GUI_Dialog_OK = (void (*)(void *HANDLE, void *CB, const char* heading, const char* line1, const char* line2, const char* line3))
+      dlsym(m_libXBMC_gui, "GUI_Dialog_OK");
+    if (GUI_Dialog_OK == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
+    GUI_Dialog_YesNo = (bool (*)(void *HANDLE, void *CB, const char* heading, const char* line1, const char* line2, const char* line3))
+      dlsym(m_libXBMC_gui, "GUI_Dialog_YesNo");
+    if (GUI_Dialog_YesNo == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
+    GUI_ProgressBar_create = (CAddonGUIProgressBar* (*)(void *HANDLE, void *CB, const char *title))
+      dlsym(m_libXBMC_gui, "GUI_ProgressBar_create");
+    if (GUI_ProgressBar_create == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
+    GUI_ProgressBar_destroy = (void (*)(CAddonGUIProgressBar* p))
+      dlsym(m_libXBMC_gui, "GUI_ProgressBar_destroy");
+    if (GUI_ProgressBar_destroy == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
 
     m_Callbacks = GUI_register_me(m_Handle);
     return m_Callbacks != NULL;
@@ -259,6 +275,26 @@ public:
     return GUI_control_release_rendering(p);
   }
 
+  void Dialog_OK(const char* heading, const char* line1, const char* line2, const char* line3)
+  {
+    GUI_Dialog_OK(m_Handle, m_Callbacks, heading, line1, line2, line3);
+  }
+
+  bool Dialog_YesNo(const char* heading, const char* line1, const char* line2, const char* line3)
+  {
+    return GUI_Dialog_YesNo(m_Handle, m_Callbacks, heading, line1, line2, line3);
+  }
+
+  CAddonGUIProgressBar* ProgressBar_create(const char *title)
+  {
+    return GUI_ProgressBar_create(m_Handle, m_Callbacks, title);
+  }
+
+  void ProgressBar_destroy(CAddonGUIProgressBar* p)
+  {
+    return GUI_ProgressBar_destroy(p);
+  }
+
 protected:
   void* (*GUI_register_me)(void *HANDLE);
   void (*GUI_unregister_me)(void *HANDLE, void* CB);
@@ -279,6 +315,10 @@ protected:
   void (*GUI_ListItem_destroy)(CAddonListItem* p);
   CAddonGUIRenderingControl* (*GUI_control_get_rendering)(void *HANDLE, void* CB, CAddonGUIWindow *window, int controlId);
   void (*GUI_control_release_rendering)(CAddonGUIRenderingControl* p);
+  void (*GUI_Dialog_OK)(void *HANDLE, void *CB, const char* heading, const char* line1, const char* line2, const char* line3);
+  bool (*GUI_Dialog_YesNo)(void *HANDLE, void *CB, const char* heading, const char* line1, const char* line2, const char* line3);
+  CAddonGUIProgressBar* (*GUI_ProgressBar_create)(void *HANDLE, void* CB, const char *title);
+  void (*GUI_ProgressBar_destroy)(CAddonGUIProgressBar* p);
 
 private:
   void *m_libXBMC_gui;
@@ -456,4 +496,21 @@ private:
   GUIHANDLE   m_RenderingHandle;
   void *m_Handle;
   void *m_cb;
+};
+
+class CAddonGUIProgressBar
+{
+public:
+  CAddonGUIProgressBar(void *hdl, void *cb, const char *title);
+  virtual ~CAddonGUIProgressBar() {}
+
+  virtual void SetText(const char *label);
+  virtual void SetPercentage(float percentage);
+  virtual float GetPercentage();
+  virtual void MarkFinished();
+
+private:
+  void *m_Handle;
+  void *m_cb;
+  GUIHANDLE m_progressBarHandle;
 };
