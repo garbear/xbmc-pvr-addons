@@ -30,6 +30,8 @@
 
 using namespace ADDON;
 
+#define CONFUSING_VDR_PRIORITY  0
+
 cVNSIDemux::cVNSIDemux()
 {
 }
@@ -210,7 +212,7 @@ bool cVNSIDemux::SwitchChannel(const PVR_CHANNEL &channelinfo)
   cRequestPacket vrp2;
   if (!vrp2.init(VNSI_CHANNELSTREAM_OPEN) ||
       !vrp2.add_U32(channelinfo.iUniqueId) ||
-      !vrp2.add_S32(g_iPriority) ||
+      !vrp2.add_S32(CONFUSING_VDR_PRIORITY) ||
       !vrp2.add_U8(1) ||
       !ReadSuccess(&vrp2))
   {

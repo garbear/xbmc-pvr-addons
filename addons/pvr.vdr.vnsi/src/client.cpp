@@ -46,7 +46,6 @@ int           g_iPort                   = DEFAULT_PORT;
 bool          g_bCharsetConv            = DEFAULT_CHARCONV;     ///< Convert VDR's incoming strings to UTF8 character set
 bool          g_bHandleMessages         = DEFAULT_HANDLE_MSG;   ///< Send VDR's OSD status messages to XBMC OSD
 int           g_iConnectTimeout         = DEFAULT_TIMEOUT;      ///< The Socket connection timeout
-int           g_iPriority               = DEFAULT_PRIORITY;     ///< The Priority this client have in response to other clients
 bool          g_bAutoChannelGroups      = DEFAULT_AUTOGROUPS;
 int           g_iTimeshift              = 1;
 
@@ -128,14 +127,6 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     /* If setting is unknown fallback to defaults */
     XBMC->Log(LOG_ERROR, "Couldn't get 'port' setting, falling back to '%i' as default", DEFAULT_PORT);
     g_iPort = DEFAULT_PORT;
-  }
-
-  /* Read setting "priority" from settings.xml */
-  if (!XBMC->GetSetting("priority", &g_iPriority))
-  {
-    /* If setting is unknown fallback to defaults */
-    XBMC->Log(LOG_ERROR, "Couldn't get 'priority' setting, falling back to %i as default", DEFAULT_PRIORITY);
-    g_iPriority = DEFAULT_PRIORITY;
   }
 
   /* Read setting "timeshift" from settings.xml */
@@ -270,11 +261,6 @@ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
       g_iPort = *(int*) settingValue;
       return ADDON_STATUS_NEED_RESTART;
     }
-  }
-  else if (str == "priority")
-  {
-    XBMC->Log(LOG_INFO, "Changed Setting 'priority' from %u to %u", g_iPriority, *(int*) settingValue);
-    g_iPriority = *(int*) settingValue;
   }
   else if (str == "timeshift")
   {
