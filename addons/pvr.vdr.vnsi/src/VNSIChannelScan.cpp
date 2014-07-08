@@ -135,7 +135,6 @@ void* cVNSIChannelScan::Process()
   if (progressBar)
     progressBar->MarkFinished();
   GUI->ProgressBar_destroy(progressBar);
-  m_vnsiData.Close();
   delete vresp;
   return NULL;
 }
