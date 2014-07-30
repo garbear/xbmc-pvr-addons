@@ -118,8 +118,10 @@ void* cVNSIChannelScan::Process()
       progressBar->SetPercentage(percentage);
 
       const unsigned int frequencyHz = vresp->extract_U32();
-      char text[16];
-      snprintf(text, sizeof(text), "%d MHz", frequencyHz / (1000 * 1000));
+      const unsigned int channelNumber = vresp->extract_U32();
+
+      char text[32];
+      snprintf(text, sizeof(text), "Channel %d (%d MHz)", channelNumber, frequencyHz / (1000 * 1000));
       progressBar->SetText(text);
 
       delete vresp;
