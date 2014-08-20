@@ -19,6 +19,8 @@
  *
  */
 
+#include "xbmc_content_types.h"
+
 #include <string>
 #include <vector>
 #include <string.h>
@@ -41,16 +43,6 @@
 #define ADDON_HELPER_ARCH       "x86-osx"
 #else
 #define ADDON_HELPER_ARCH       "x86-osx"
-#endif
-#elif defined(__FreeBSD__)	// freebsd
-#if defined(__x86_64__)
-#define ADDON_HELPER_ARCH	"x86_64-freebsd"
-#elif defined(_POWERPC)
-#define ADDON_HELPER_ARCH	"powerpc-freebsd"
-#elif defined(_POWERPC64)
-#define ADDON_HELPER_ARCH	"powerpc64-freebsd"
-#else
-#define ADDON_HELPER_ARCH	"i386-freebsd"
 #endif
 #else                           // linux
 #if defined(__x86_64__)
@@ -248,6 +240,10 @@ namespace ADDON
         dlsym(m_libXBMC_addon, "XBMC_delete_file");
       if (XBMC_delete_file == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
 
+      XBMC_rename_file = (bool (*)(void* HANDLE, void* CB, const char *strFileName, const char* strFileNameNew))
+        dlsym(m_libXBMC_addon, "XBMC_rename_file");
+      if (XBMC_rename_file == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
       XBMC_can_open_directory = (bool (*)(void* HANDLE, void* CB, const char* strURL))
         dlsym(m_libXBMC_addon, "XBMC_can_open_directory");
       if (XBMC_can_open_directory == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
@@ -260,9 +256,21 @@ namespace ADDON
         dlsym(m_libXBMC_addon, "XBMC_directory_exists");
       if (XBMC_directory_exists == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
 
+      XBMC_get_directory = (bool (*)(void* HANDLE, void* CB, const char* strPath, CONTENT_ADDON_FILELIST** directory))
+        dlsym(m_libXBMC_addon, "XBMC_get_directory");
+      if (XBMC_get_directory == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
+      XBMC_free_directory = (void (*)(void* HANDLE, void* CB, CONTENT_ADDON_FILELIST* directory))
+        dlsym(m_libXBMC_addon, "XBMC_free_directory");
+      if (XBMC_free_directory == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
       XBMC_remove_directory = (bool (*)(void* HANDLE, void* CB, const char* strPath))
         dlsym(m_libXBMC_addon, "XBMC_remove_directory");
       if (XBMC_remove_directory == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
+
+      XBMC_get_box_id = (char* (*)(void *HANDLE, void* CB))
+        dlsym(m_libXBMC_addon, "XBMC_get_box_id");
+      if (XBMC_get_box_id == NULL) { fprintf(stderr, "Unable to assign function %s\n", dlerror()); return false; }
 
       m_Callbacks = XBMC_register_me(m_Handle);
       return m_Callbacks != NULL;
@@ -520,6 +528,17 @@ namespace ADDON
     }
 
     /*!
+     * @brief Renames a file.
+     * @param strFileName The filename to rename.
+     * @param strFileNameNew The new filename.
+     * @return The file was successfully renamed.
+     */
+    bool RenameFile(const char *strFileName, const char* strFileNameNew)
+    {
+      return XBMC_rename_file(m_Handle, m_Callbacks, strFileName, strFileNameNew);
+    }
+
+    /*!
      * @brief Checks whether a directory can be opened.
      * @param strUrl The URL of the directory to check.
      * @return True when it can be opened, false otherwise.
@@ -550,6 +569,26 @@ namespace ADDON
     }
 
     /*!
+     * @brief List the contents of a directory.
+     * @param strPath Path to the directory.
+     * @param directory Pointer to the directory object to be allocated.
+     * @return True if directory is populated. Must be freed by calling FreeDirectory() when done.
+     */
+    bool GetDirectory(const char* strPath, CONTENT_ADDON_FILELIST** directory)
+    {
+      return XBMC_get_directory(m_Handle, m_Callbacks, strPath, directory);
+    }
+
+    /*!
+     * @brief Free the memory used by directory.
+     * @param directory The CONTENT_ADDON_FILELIST to free.
+     */
+    void FreeDirectory(CONTENT_ADDON_FILELIST* directory)
+    {
+      XBMC_free_directory(m_Handle, m_Callbacks, directory);
+    }
+
+    /*!
      * @brief Removes a directory.
      * @param strPath Path to the directory.
      * @return True when it was removed, false otherwise.
@@ -557,6 +596,14 @@ namespace ADDON
     bool RemoveDirectory(const char *strPath)
     {
       return XBMC_remove_directory(m_Handle, m_Callbacks, strPath);
+    }
+
+    /*!
+     * @return A unique id for this box. Must be freed by calling FreeString() when done.
+     */
+    char* GetBoxId(void)
+    {
+      return XBMC_get_box_id(m_Handle, m_Callbacks);
     }
 
   protected:
@@ -585,10 +632,14 @@ namespace ADDON
     bool (*XBMC_file_exists)(void *HANDLE, void* CB, const char *strFileName, bool bUseCache);
     int (*XBMC_stat_file)(void *HANDLE, void* CB, const char *strFileName, struct __stat64* buffer);
     bool (*XBMC_delete_file)(void *HANDLE, void* CB, const char *strFileName);
+    bool (*XBMC_rename_file)(void *HANDLE, void* CB, const char *strFileName, const char *strFileNameNew);
     bool (*XBMC_can_open_directory)(void *HANDLE, void* CB, const char* strURL);
     bool (*XBMC_create_directory)(void *HANDLE, void* CB, const char* strPath);
     bool (*XBMC_directory_exists)(void *HANDLE, void* CB, const char* strPath);
+    bool (*XBMC_get_directory)(void *HANDLE, void* CB, const char* strPath, CONTENT_ADDON_FILELIST** directory);
+    void (*XBMC_free_directory)(void *HANDLE, void* CB, CONTENT_ADDON_FILELIST* directory);
     bool (*XBMC_remove_directory)(void *HANDLE, void* CB, const char* strPath);
+    char* (*XBMC_get_box_id)(void *HANDLE, void* CB);
 
   private:
     void *m_libXBMC_addon;
