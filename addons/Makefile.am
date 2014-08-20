@@ -6,18 +6,8 @@ if ADDON_IPTVSIMPLE
 endif
 
 SUBDIRS = pvr.demo \
-          pvr.dvbviewer \
           pvr.hts \
-          pvr.mediaportal.tvserver \
-          pvr.nextpvr \
-          pvr.vdr.vnsi \
-          pvr.njoy \
-          pvr.vuplus \
-          pvr.argustv \
-          pvr.dvblink \
-          pvr.wmc \
-          $(ADDON_MYTHTV_SUBDIRS) \
-          $(ADDON_IPTVSIMPLE_SUBDIRS)
+          pvr.vdr.vnsi
 
 clean:
 	-rm -f *.zip
