@@ -238,6 +238,9 @@ bool cVNSIData::GetChannelsList(ADDON_HANDLE handle, bool radio)
     char *strCaids        = vresp->extract_String();
     tag.bIsRadio          = radio;
 
+    if (GetProtocol() >= 7)
+      tag.iSubChannelNumber = vresp->extract_U32();
+
     PVR->TransferChannelEntry(handle, &tag);
     delete[] strChannelName;
     delete[] strProviderName;
