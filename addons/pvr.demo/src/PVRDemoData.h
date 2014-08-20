@@ -51,6 +51,7 @@ struct PVRDemoChannel
   bool                    bRadio;
   int                     iUniqueId;
   int                     iChannelNumber;
+  int                     iSubChannelNumber;
   int                     iEncryptionSystem;
   std::string             strChannelName;
   std::string             strIconPath;
