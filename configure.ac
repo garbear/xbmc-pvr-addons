@@ -29,12 +29,6 @@ AC_ARG_ENABLE([addons-with-dependencies],
   [build_addons_with_dependencies=$enableval],
   [build_addons_with_dependencies=no])
 
-AC_ARG_ENABLE([mysql],
-  [AS_HELP_STRING([--disable-mysql],
-  [disable mysql])],
-  [use_mysql=$enableval],
-  [use_mysql=yes])
-
 BUILD_TYPE="debug"
 if test "$use_release" = "yes"; then
   BUILD_TYPE="release"
@@ -145,21 +139,6 @@ echo "GLES2: $have_gles2"
 if test "$build_addons_with_dependencies" = "yes"; then
   echo "Building addons with dependencies"
 
-  ### Libs that addons depend on
-  if test "$use_mysql" = "yes"; then
-    AC_PATH_PROG(MYSQL_CONFIG, mysql_config, "no")
-    if test "x$MYSQL_CONFIG" != "xno"; then
-      AC_DEFINE([HAVE_MYSQL],[1],["Define to 1 if you have the `mysql' library (-lmysqlclient)."])
-      MYSQL_INCLUDES=`$MYSQL_CONFIG --include`
-      MYSQL_LIBS=`$MYSQL_CONFIG --libs`
-      AC_SUBST(MYSQL_INCLUDES)
-      AC_SUBST(MYSQL_LIBS)
-    else
-      use_mysql=no
-    fi
-  fi
-  echo "MySQL: $use_mysql"
-
   # Checks for boost headers
   AC_LANG_PUSH([C++])
   AC_CHECK_HEADER([boost/shared_ptr.hpp], use_boost=yes, use_boost=no,)
@@ -177,10 +156,6 @@ if test "$build_addons_with_dependencies" = "yes"; then
   fi
   echo "Zlib: $use_zlib"
 fi
-
-### Addons with dependencies
-AM_CONDITIONAL([ADDON_MYTHTV], [test "$build_addons_with_dependencies" = "yes" -a "$use_mysql" = "yes" -a "$use_boost" = "yes"])
-AM_CONDITIONAL([ADDON_IPTVSIMPLE], [test "$build_addons_with_dependencies" = "yes" -a "$use_zlib" = "yes"])
 
 ### Check for Intree building
 if test "x${cross_compiling}" = "xyes" || test "x${cross_compiling}" = "xmaybe"; then
@@ -265,40 +240,9 @@ AC_SUBST(DATADIR)
 
 AC_CONFIG_FILES([Makefile \
                  lib/Makefile \
-                 lib/jsoncpp/Makefile \
                  lib/libhts/Makefile \
-                 lib/tinyxml/Makefile \
-                 lib/cmyth/Makefile \
-                 lib/cmyth/libcmyth/Makefile \
-                 lib/cmyth/librefmem/Makefile \
-                 lib/tinyxml2/Makefile \
-                 lib/libdvblinkremote/Makefile \
                  addons/Makefile \
-                 addons/pvr.demo/Makefile \
-                 addons/pvr.dvbviewer/Makefile \
-                 addons/pvr.argustv/Makefile \
-                 addons/pvr.hts/Makefile \
-                 addons/pvr.mediaportal.tvserver/Makefile \
-                 addons/pvr.nextpvr/Makefile \
-                 addons/pvr.njoy/Makefile \
-                 addons/pvr.vuplus/Makefile \
                  addons/pvr.vdr.vnsi/Makefile \
-                 addons/pvr.mythtv.cmyth/Makefile \
-                 addons/pvr.dvblink/Makefile \
-                 addons/pvr.wmc/Makefile \
-                 addons/pvr.iptvsimple/Makefile \
-                 addons/pvr.argustv/addon/addon.xml
-                 addons/pvr.demo/addon/addon.xml
-                 addons/pvr.dvbviewer/addon/addon.xml
-                 addons/pvr.hts/addon/addon.xml
-                 addons/pvr.mediaportal.tvserver/addon/addon.xml
-                 addons/pvr.mythtv.cmyth/addon/addon.xml
-                 addons/pvr.nextpvr/addon/addon.xml
-                 addons/pvr.njoy/addon/addon.xml
-                 addons/pvr.vdr.vnsi/addon/addon.xml
-                 addons/pvr.vuplus/addon/addon.xml
-                 addons/pvr.dvblink/addon/addon.xml
-                 addons/pvr.wmc/addon/addon.xml
-                 addons/pvr.iptvsimple/addon/addon.xml])
+                 addons/pvr.vdr.vnsi/addon/addon.xml])
 
 AC_OUTPUT

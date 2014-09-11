@@ -1,13 +1,4 @@
-if ADDON_MYTHTV
-          ADDON_MYTHTV_SUBDIRS = pvr.mythtv.cmyth
-endif
-if ADDON_IPTVSIMPLE
-          ADDON_IPTVSIMPLE_SUBDIRS = pvr.iptvsimple
-endif
-
-SUBDIRS = pvr.demo \
-          pvr.hts \
-          pvr.vdr.vnsi
+SUBDIRS = pvr.vdr.vnsi
 
 clean:
 	-rm -f *.zip
