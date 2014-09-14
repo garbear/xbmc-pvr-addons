@@ -105,6 +105,7 @@ namespace ADDON
     {
       m_libXBMC_addon = NULL;
       m_Handle        = NULL;
+      m_Callbacks     = NULL;
     }
 
     ~CHelper_libXBMC_addon()
